@@ -1,65 +1,178 @@
+using System.Globalization;
+
 namespace ConsoleApp2;
 
-public class GuestBook
+public static class Messaggi
 {
-    public static void Run()
+    public static void Benvenuto()
     {
-        int numeroPartecipantiInCoda = PartecipantiInCoda();
-        int FamigliePartecipanti = 0;
-        int TotalePartecipanti = 0;
-        var listaTotalePartecipanti = ListaTotalePartecipanti();
+        Console.WriteLine("Benvenuti e grazie per partecipare all'evento");
+    }
 
-        if (numeroPartecipantiInCoda > 0)
-        {
-            while (numeroPartecipantiInCoda > 0)
-            {
-                Messaggi.Benvenuto();
-                Messaggi.AskName();
-                string cognomeFamiglia = RegistrareCognomeFamiglia.RegistrareCognome();
-                Messaggi.ChiederePartecipanti(cognomeFamiglia);
-                int numeroPartecipanti = NumeroPartecipanti.nrPartecipanti();
-                var listaNomi = NomePartecipanti.ListaNomiPartecipanti(numeroPartecipanti);
-                Messaggi.ConfermaTuttiPartecipantiInseriti(numeroPartecipanti, cognomeFamiglia);
-                PrintLista.StampaLista(listaNomi,cognomeFamiglia);
-                MergeList.IntoToFinalList(listaNomi,listaTotalePartecipanti,cognomeFamiglia);
-                
-            
-                numeroPartecipantiInCoda--;
-                FamigliePartecipanti++;
-                TotalePartecipanti += numeroPartecipanti;
-            }
-        }
+    public static void AskName()
+    {
+        Console.WriteLine("Potrei avere il cognome della famiglia per registrarvi all'evento?");
+    }
 
-        else
-        {
-            Messaggi.NessunPartecipanteInCoda();
-        }
-
-        if (FamigliePartecipanti > 0)
-        {
-            Messaggi.NumeroTotaleFamiglieEPartecipanti(FamigliePartecipanti,TotalePartecipanti);
-            PrintLista.StampaListaFinale(listaTotalePartecipanti);
-        }        
+    public static void ChiederePartecipanti(string cognome)
+    {
+        Console.WriteLine($"grazie famiglia {cognome},quanti partecipanti siete?");
     }
     
-    public static int NumeroMinimoPartecipanti()
+    public static void ConfermaNumeroPartecipanti(int nr)
     {
-        int numeroMinimoPartecipanti = 1;
-        return numeroMinimoPartecipanti;
+        Console.WriteLine($"Bene siete in {nr},mi ora per registrarvi mi serve il  nome dei partecipanti?");
     }
 
-    public static int PartecipantiInCoda()
+    public static void PartecipanteAggiunto()
     {
-        int numeroPartecipantiInCoda = 3;
-        return numeroPartecipantiInCoda;
+        Console.WriteLine("partecipante aggiunto con successo");
     }
 
-    public static List<string> ListaTotalePartecipanti()
+    public static void ConfermaTuttiPartecipantiInseriti(int nr,string cognome)
     {
-        List<string> listaTotalePartecipanti = new List<string>();
-        
-        return listaTotalePartecipanti;
+        Console.WriteLine($"Perfetto tutti i {nr} partecipanti della famiglia {cognome} sono stati aggiunti con successo all'evento");
     }
-    
+
+    public static void ErroreInputNonValido()
+    {
+        Console.WriteLine("Errore,Inserire un valore numerico");
+    }
+
+    public static void ListaPartecipantiFamiglia()
+    {
+        Console.WriteLine("Registrazione avvenuta con successo, questa è la lista dei partecipanti della vostra famiglia:");
+    }
+
+    public static void NumeroMinimoDiPartecipanti(int numeroPartecipantiMinimo)
+    {
+        Console.WriteLine($"Errore, il numero dei partecipanti deve essere minimo {numeroPartecipantiMinimo}");
+    }
+
+    public static void Grazie()
+    {
+        Console.WriteLine("grazie per aver usato la nostra app di registrane");
+    }
+
+    public static void RegistrazioneSuccesso()
+    {
+        Console.WriteLine("registrazione effettuata con successo");
+    }
+
+    public static void NessunPartecipanteInCoda()
+    {
+        Console.WriteLine("Nessun partecipante in coda");
+    }
+
+    public static void NumeroTotaleFamiglieEPartecipanti(int numeroFamigliePartecipanti,int numeroPartecipanti)
+    {
+        Console.WriteLine($"il numero delle famiglie partecipanti è di {numeroFamigliePartecipanti} per un totale di {numeroPartecipanti} Partecipanti,di seguito i nomi:");
+    }
     
 }
+
+public static class RegistrareCognomeFamiglia
+{
+    public static string RegistrareCognome()
+    {
+        string cognome = Console.ReadLine();
+        
+        return cognome;
+    } 
+}
+
+public static class NumeroPartecipanti
+{
+    public static int nrPartecipanti()
+    {
+        bool loop = true;
+        bool isValid = int.TryParse(Console.ReadLine(), out int number);
+        int numeroMinimo = GuestBook.NumeroMinimoPartecipanti();
+
+        while(loop)
+        {
+            if (!isValid)
+            {
+                Messaggi.ErroreInputNonValido();
+                isValid = int.TryParse(Console.ReadLine(), out number);  
+            }
+            else if (number < 1)
+            {
+                Messaggi.NumeroMinimoDiPartecipanti(numeroMinimo);
+                isValid = int.TryParse(Console.ReadLine(), out number);  
+            }
+
+            else
+            {
+                Messaggi.ConfermaNumeroPartecipanti(number);
+                loop = false;
+            }
+            
+                
+            
+        }
+        
+       
+        
+        return number;
+    } 
+}
+
+public static class NomePartecipanti
+{
+    public static List<string> ListaNomiPartecipanti(int numeroPartecipanti)
+    {
+        int counter = 0;
+        string nome;
+        List<string>Partecipanti = new List<string>();
+
+        while (counter < numeroPartecipanti)
+        {
+            nome = Console.ReadLine();
+            Messaggi.PartecipanteAggiunto();
+            Partecipanti.Add(nome);
+            counter++;
+        }
+        
+        return Partecipanti;
+    }
+}
+
+public static class PrintLista
+{
+    public static void StampaLista(List<string> listaFamiglia,string cognome)
+    {
+        Messaggi.ListaPartecipantiFamiglia();
+
+        foreach (string item in listaFamiglia)
+        {
+            Console.WriteLine($"{item} {cognome}");
+        }
+    }
+
+    public static void StampaListaFinale(List<string> listaFamigliaFinale)
+    {
+        foreach (string item in listaFamigliaFinale)
+        {
+            Console.WriteLine(item);
+        }
+    }
+    
+}
+
+public static class MergeList
+{
+
+    public static void IntoToFinalList(List<string> listaFamiglia,List<string>listaFinale,string cognome)
+    {
+        foreach (string item in listaFamiglia)
+        {
+            
+            listaFinale.Add($"{item} {cognome}");
+        }
+        
+        listaFinale.Sort();
+    }
+}
+
+
